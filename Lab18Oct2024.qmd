@@ -206,7 +206,7 @@ axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
 ```
 
 
-# Question 3. ()
+# Question 3
 
 ```{r}
 #| echo: false
@@ -239,7 +239,7 @@ combine the two data sets by row
 ```{r}
 data_plot=rbind(data_most_violence,data_most_peaceful)
 ```
-# Question 4 ()
+# Question 4
 ```{r}
 plot4=ggplot(data=data_plot, # data
 mapping=aes(x=label,y=e0,fill=label))+ # relationships
