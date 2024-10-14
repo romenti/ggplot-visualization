@@ -15,7 +15,7 @@ execute:
 
 # Introduction
 
-Measuring **violence** experienced by a country is a challenging task.
+Measuring **violence** in a country is a challenging task.
 \vspace{20pt}
 
 - **Violence** is a multifaceted concept
@@ -28,19 +28,26 @@ Measuring **violence** experienced by a country is a challenging task.
 
 - The level of violence may affect the mortality of a country
 \vspace{20pt}
-- Today, we will harness two major data sources to explore the bivariate relationship between violence and mortality via:
+- Today, we will rely on two major data sources to explore the relationship between violence and mortality:
   \vspace{20pt}
   - Data on Violece from the Institute for Economics & Peace
+  \vspace{20pt}
   - Data on Mortality from the United Nations
+\vspace{20pt}
+- We will produce multiple descriptive plots with functions from **ggplot**
 
-- We will produce multiple descriptive plots with **ggplot**
+# What about ggplot?
+
+**ggplot2** is an R package for producing statistical, or data, graphics
+\vspace{10pt}
+
+Already available in *tidyverse*
+
+![Elephant](Images/logo-ggplot2.png){width=1.5in}
+\vspace{20pt}
 
 # ggplot
 
-**ggplot** is an R package for producing statistical, or data, graphics
-\vspace{20pt}
-Already available in *tidyverse*
-\vspace{20pt}
 Major advantages:
 \vspace{20pt}
 
@@ -49,123 +56,160 @@ Major advantages:
 - detailed theming system to generate nice-looking graphs
 \vspace{20pt}
 - intuitive grammar
+\vspace{20pt}
+- graphs are R objects
+
+
+
 
 # Indicators for violence and mortality
 
 - **Violence** $\rightarrow$ **Global Peaceful Index** (GPI) that measures the violence of a country across three dimensions:
-\vspace{10pt}
+\vspace{20pt}
    -  ongoing domestic and international conflict
+   \vspace{10pt}
    -  societal safety and security
+   \vspace{10pt}
    -  militarization
 \vspace{20pt}
 
-- **Mortality** $\rightarrow$ **Life Expectancy at Birth** ($e_0$)
-\vspace{20pt}
-- Two *.txt* data files: *gpi_data.txt* and *life_exp_data.txt*
+- **Mortality** $\rightarrow$ **life expectancy at birth** ($e_0$)
+   \vspace{10pt}
+   - common indicator for capturing the mortality of a population
 
+
+# Data files
+Two *.txt* data files on Virtuale
+\vspace{20pt}
+
+- *gpi_data.txt* $\rightarrow$ GPI for multiple countries over 2008-2022
+\vspace{20pt}
+- *life_exp_data.txt* $\rightarrow$ life expectancy estimates for multiple countries over 2008-2022 couple
+   \vspace{10pt}
+   - Regional classification included
+   \vspace{10pt}
+   - Total population size
+   
 # Upload data in Rstudio
 Upload *tidyverse* and the data sets
+\vspace{10pt}
 ```{r}
 #install.packages('ggthemes')
-#install.packages('ggthemes')
+#install.packages('RColorBrewer')
 library('RColorBrewer') # various qualitative color palettes 
-library('ggthemes') # niche themes in ggplot
+library('ggthemes') # various themes in ggplot
 library("tidyverse") # ggplot2
+
 gpi_data <- read.table('Data/gpi_data.txt',header=T)
 life_exp_data <- read.table('Data/life_exp_data.txt',header=T)
 ```
-Link the two data sets by iso3 and year
+Combine the two data sets by *iso3* (unique to each country) and *Year*
+\vspace{10pt}
 ```{r}
-data <- left_join(gpi_data,life_exp_data,by=c('iso3','Year'))
+data <- inner_join(gpi_data,life_exp_data,by=c('iso3','Year'))
 ```
+\vspace{10pt}
 
+We match all records in *gpi_data*, whose *iso3* and *Year* values have a correspondence in *life_exp_data*
+\vspace{10pt}
+
+The non-matching records, either in  *gpi_data* or in *life_exp_data*, are dropped
 
 # Question (1)
 
 Create a plot displaying the evolution of violence over the time period 2008-2022 by world region
 
-1. Calculate region-specific levels of violence 
+Calculate region- and year-specific levels of violence 
+\vspace{10pt}
 ```{r}
 data_violence_region = data |>
       group_by(Year,area) |>
-      summarize(GPI=weighted.mean(x=GPI,w=pop,na.rm = FALSE))
+      summarize(GPI=weighted.mean(x=GPI,w=pop,na.rm = FALSE)) 
 ```
-2. Produce the plot 
+Generate the plot 
+\vspace{10pt}
 ```{r}
 plot1 = ggplot(data=data_violence_region, # data input
      mapping=aes(x=Year,y=GPI,color=area))+ # relationships
-     geom_line()+ # add a line for each country
-     geom_point()+ # add points 
-     theme_clean()+ # specify a theme
-     xlab('Year')+ #label for title of x-axis
-     ylab('Level of Violence') + # label for title of y-axis
-     ggtitle('Region-specific Violence over Time')  # title
+geom_line()+ # add a line for each country
+geom_point()+ # add points 
+theme_clean()+ # background
+scale_color_brewer(name = "Region", palette = "Set1")+ # color palette 
+xlab('Year')+ #label for title of x-axis
+ylab('Level of Violence') + # label for title of y-axis
+ggtitle('Region-specific Violence over Time')  # title for the plot
 ```
-# Question (1) cont.
+# Question (1) 
 
-```{r}
+```{r,echo=F}
+#| echo: false
 plot1
 ```
 # Question (2)
-
 Create a similar visual aid for life expectancy
+\vspace{10pt}
 
-1. Calculate region-specific life expectancies 
+Calculate region-specific life expectancies 
+\vspace{10pt}
 ```{r}
 data_life_exp_region = data |>
       group_by(Year,area) |>
       summarize(e0=weighted.mean(x=e0,w=pop,na.rm = FALSE))
 ```
-2. Produce the plot 
+Generate the plot 
+\vspace{10pt}
 ```{r}
 plot2 = ggplot(data=data_life_exp_region, # data input
-     mapping=aes(x=Year,y=e0,color=area))+ # relationships
-     geom_line()+ # add a line for each country
-     geom_point()+ # add points 
-     annotate("text",x=2020,y=70,label="COVID-19")+
-     theme_clean()+ # specify a theme
-     xlab('Year')+ #label for title of x-axis
-     ylab('Life Expectancy') + # label for title of y-axis
-     scale_color_brewer(palette = "Set2")+
-     ggtitle('Region-specific Life Expectancy over Time') 
-     # title
+mapping=aes(x=Year,y=e0,color=area))+ # relationships
+geom_line()+ # add a line for each country
+geom_point()+ # add points 
+annotate("text",x=2020,y=70,label="COVID-19")+ # add text
+theme_clean()+ # specify a theme
+xlab('Year')+ #label for title of x-axis
+ylab('Life Expectancy') + # label for title of y-axis
+scale_color_brewer(name = "Region", palette = "Set1")+ # change color palette
+ggtitle('Region-specific Life Expectancy over Time')  # title
 ```
 
-# Question (2) cont.
+# Question (2) 
 
 ```{r}
+#| echo: false
 plot2
 ```
 # Question (3)
 
-Produce two scatter plots to display the relationship between violence and life expectancy in 2008 and 2022. Add also a fitting line. 
+Produce two scatter plots to display the relationship between violence and life expectancy in 2008 and 2022. Add also a regression line. 
+\vspace{20pt}
 
 Select records for years 2008 and 2022
+\vspace{10pt}
 ```{r}
 data_scatter = data |>
 filter(Year %in% c(2008,2022))
 ```
-Select records for years 2008 and 2022
+Generate the plot
+\vspace{10pt}
 ```{r}
-
 plot3 = ggplot(data=data_scatter, # data input
 mapping=aes(x=GPI,y=e0))+ # relationships
-geom_point()+  
-xlab('Level of Violence')+
-ylab('Life Expectancy')+
-theme_economist()+
+geom_point()+  # scatter plot
+xlab('Level of Violence')+ # x-axis label
+ylab('Life Expectancy')+ # y-axis label
+theme_economist()+ # pick a background
 geom_smooth(method = "lm", se = FALSE,color='red')+ # regression line
-facet_wrap(~Year) + # seperate by year
+facet_wrap(~Year) + # seperate (sub)plot by year
 theme(axis.text.y = element_text(size=15,face="bold"), # font of y-axis text
-      axis.title.y = element_text(size=15,face="bold"), # font of y-axis title
-      axis.text.x = element_text(size=15,face="bold"),  
-      axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
+axis.title.y = element_text(size=15,face="bold"), # font of y-axis title
+axis.text.x = element_text(size=15,face="bold"),  
+axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
 ```
 
 
-# Question 3. (cont.)
+# Question 3. ()
 
 ```{r}
+#| echo: false
 plot3 
 ```
 
@@ -178,8 +222,8 @@ Let's create the data sets
 Most violent countries
 ```{r}
 data_most_violence = data |>
-       filter(Year==2022) |>
-      slice_max(GPI,n=20) |>
+      filter(Year==2022) |>
+      slice_max(GPI,n=20) |> 
       mutate(label='Most Violent')
 ```
 \vspace{10pt}
@@ -195,26 +239,27 @@ combine the two data sets by row
 ```{r}
 data_plot=rbind(data_most_violence,data_most_peaceful)
 ```
-# Question 4 (cont.)
+# Question 4 ()
 ```{r}
-plot4=ggplot(data=data_plot,
-       aes(x=label,y=e0,fill=label))+
-       geom_boxplot()+
-    coord_cartesian(ylim=c(30,90))+
-     scale_y_continuous(breaks=seq(30,90,10),
-                        labels=seq(30,90,10))+
-     theme_tufte()+
-     scale_fill_discrete(name='')+
-     xlab('')+
-     ylab('Life Expectancy')+
-     theme(axis.text.y = element_text(size=15,face="bold"), # font of y-axis text
-      legend.text = element_text(size=15,face="bold"),
-      axis.title.y = element_text(size=15,face="bold"), # font of y-axis title
-      axis.text.x = element_text(size=15,face="bold"),  
-      axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
+plot4=ggplot(data=data_plot, # data
+mapping=aes(x=label,y=e0,fill=label))+ # relationships
+geom_boxplot()+ # boxplot
+coord_cartesian(ylim=c(30,90))+ # fix y-axis limits
+scale_y_continuous(breaks=seq(30,90,10),
+                   labels=seq(30,90,10))+ # fix y-axis labels
+theme_tufte()+ # pick background
+scale_fill_discrete(name='')+ # drop name from legend
+xlab('')+ # no name for x-axis title
+ylab('Life Expectancy')+ # y-axis title
+theme(axis.text.y = element_text(size=15,face="bold"), # font of y-axis text
+legend.text = element_text(size=15,face="bold"), # legend text details
+axis.title.y = element_text(size=15,face="bold"), # font of y-axis title
+axis.text.x = element_text(size=15,face="bold"),  # text of x-axis title
+axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
 ```
-# Question 4 (cont.)
+# Question 4 
 ```{r}
+#| echo: false
 plot4
 ```
 
@@ -223,48 +268,109 @@ plot4
 Perform the same task using a different visual aid.
 
 ```{r}
-plot5 = ggplot(data=data_plot,
-       aes(x=e0,fill=label,color=label))+
-     geom_density(alpha = 0.2, na.rm = TRUE) + 
-     theme_tufte()+
-     scale_fill_discrete(name='')+
-     scale_color_discrete(name='')+
-     coord_cartesian(xlim=c(30,90))+
-     scale_x_continuous(breaks=seq(30,90,10),
-                        labels=seq(30,90,10))+
-     xlab('')+
-     ylab('Life Expectancy')+
-     theme(axis.text.y = element_text(size=15,face="bold"), # font of y-axis text
-      legend.text = element_text(size=15,face="bold"),
-      axis.title.y = element_text(size=15,face="bold"), # font of y-axis title
-      axis.text.x = element_text(size=15,face="bold"),  
-      axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
+plot5 = ggplot(data=data_plot,  # data input
+aes(x=e0,color=label,fill=label))+ # relationships
+geom_density(alpha = 0.2, na.rm = TRUE) + # density
+theme_stata()+ # background
+scale_fill_discrete(name='')+ # no title to legend
+scale_color_discrete(name='')+ # no title to legend
+coord_cartesian(xlim=c(30,90))+ # fix x-axis limits
+scale_x_continuous(breaks=seq(30,90,10),
+                   labels=seq(30,90,10))+ # control x-axis labels
+ylab('Density')+ # y-axis title
+xlab('Life Expectancy')+ # x-axis title
+theme(axis.text.y = element_text(size=15,face="bold"), # font of y-axis text
+legend.position = "bottom", # legend position
+axis.title.y = element_text(size=15,face="bold"), # font of y-axis title
+axis.text.x = element_text(size=15,face="bold"),  # font of x-axis text
+axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
 ```
-# Question 5 (cont.)
+# Question 5 
 ```{r}
+#| echo: false
 plot5
 ```
 
----
+# Question 6
 
-## Quarto
+Produce a scatter plot to display the relationship between violence and life expectancy in 2008 and 2022.
+\vspace{5pt}
+Make sure to set different shapes and colors for the points according to the region where they are located.
+\vspace{5pt}
+Fix the size of the points according to the population size of the country
 
-Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <https://quarto.org/docs/presentations/>.
-
-## Bullets
-
-When you click the **Render** button a document will be generated that includes:
-
--   Content authored with markdown
--   Output from executable code
-
-## Code
-
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ```{r}
-gpi_data = read.table('Data/gpi_data.txt',header=T)
-life_exp_data = read.table('Data/life_exp_data.txt',header=T)
-x=gpi_data |>
-  left_join(life_exp_data,by=c('Year','iso3'))
+plot6 = ggplot(data=data_scatter, # data input
+mapping=aes(x=GPI,y=e0))+ # relationships
+geom_point(aes(shape=area,color=area,size=pop))+ # scatter plot
+xlab('Level of Violence')+ # label x-axis
+ylab('Life Expectancy')+ # label y-axis
+theme_minimal()+ # plot them
+geom_smooth(method = "lm", se = FALSE,color='red')+ # regression line
+labs(size = 'Population Size')+ # legend label
+facet_wrap(~Year) + # seperate by year
+theme(axis.text.y = element_text(size=12,face="bold"), # font of y-axis text
+axis.title.y = element_text(size=15,face="bold"), # font of y-axis title
+legend.title = element_text(size=15,face="bold"), # font of legend title
+legend.text = element_text(size=15,face="bold"),  # font of legend text
+axis.text.x = element_text(size=12,face="bold"),  
+axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
 ```
+# Question 6 
+```{r}
+#| echo: false
+plot6
+```
+
+# Question 7
+
+Display the top 5 countries with the largest increase and the top 5 with largest decrease in violence over the period 2008-2022 in Europe, Central Asia & North America
+
+```{r}
+data_high = data |>
+filter(Year %in% c(2008,2022)) |>
+select(Year,Country,area,GPI) |>
+pivot_wider(names_from='Year',values_from='GPI') |>
+mutate(var=(`2022`-`2008`)/`2008`) |>
+group_by(area)|>
+slice_max(var,n=5) |>
+mutate(label='Highest Violence Increase')
+data_low = data |>
+filter(Year %in% c(2008,2022)) |>
+select(Year,Country,area,GPI) |>
+pivot_wider(names_from='Year',values_from='GPI') |>
+mutate(var=(`2022`-`2008`)/`2008`) |>
+group_by(area)|>
+slice_min(var,n=5) |>
+mutate(label='Highest Violence Decrease')
+```
+
+# Question 7 
+```{r}
+plot7 = rbind(data_high,data_low) |>
+filter(area=='Europe, Central Asia & North America') |>
+ggplot(aes(x=Country,y=var,fill=label))+ # data
+geom_bar(stat='identity') + # bar plot
+theme_clean()+ # background
+xlab('Country')+ # x-axis title
+ylab('Variation in Violence')+ # y-axis title
+scale_fill_brewer(name='',palette='Set2')+ # color palette
+scale_y_continuous(labels = scales::percent)+ # y-axis labels
+theme(axis.text.x = element_text(angle = 45,
+vjust = 1, hjust = 1, size = 12, face = "bold"), # x-axis text
+legend.position = 'bottom', # legend position 
+axis.text.y = element_text(size = 12, face = "bold"), # y-axis text
+axis.title.x = element_text(size = 15, face = "bold"), # x-axis title
+axis.title.y = element_text(size = 15, face = "bold"), # y-axis title
+legend.text = element_text(size = 15, face = "bold")) # legend text
+```
+
+# Question 7 
+```{r}
+#| echo: false
+plot7 
+```
+---
+
+## 
