@@ -219,3 +219,12 @@ plot7 <- rbind(data_high,data_low) |>
         axis.title.x = element_text(size = 15, face = "bold"), # x-axis title
         axis.title.y = element_text(size = 15, face = "bold"), # y-axis title
         legend.text = element_text(size = 15, face = "bold")) # legend text
+
+#### Saving your plots ####
+
+ggsave(filename = "Results/plot7.pdf", # name of the file
+       plot = plot7, # name of the plot
+       height = 20,  # height of the figure
+       width = 40, # width of the figure
+       units = "cm", # unit of measurement
+       dpi = 400) # resolution of picture 
