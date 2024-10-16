@@ -102,7 +102,7 @@ Create a plot displaying the evolution of violence over the time period 2008-202
 Calculate region- and year-specific levels of violence \vspace{10pt}
 
 ```{r}
-data_violence_region = data |>
+data_violence_region <- data |>
       group_by(Year,area) |>
       summarize(GPI=weighted.mean(x=GPI,w=pop,na.rm = FALSE)) 
 ```
@@ -110,7 +110,7 @@ data_violence_region = data |>
 Generate the plot \vspace{10pt}
 
 ```{r}
-plot1 = ggplot(data=data_violence_region, # data input
+plot1 <- ggplot(data=data_violence_region, # data input
      mapping=aes(x=Year,y=GPI,color=area))+ # relationships
 geom_line()+ # add a line for each country
 geom_point()+ # add points 
@@ -135,7 +135,7 @@ Create a similar visual aid for life expectancy \vspace{10pt}
 Calculate region-specific life expectancy estimates \vspace{10pt}
 
 ```{r}
-data_life_exp_region = data |>
+data_life_exp_region <- data |>
       group_by(Year,area) |>
       summarize(e0=weighted.mean(x=e0,w=pop,na.rm = FALSE))
 ```
@@ -143,7 +143,7 @@ data_life_exp_region = data |>
 Generate the plot \vspace{10pt}
 
 ```{r}
-plot2 = ggplot(data=data_life_exp_region, # data input
+plot2 <- ggplot(data=data_life_exp_region, # data input
 mapping=aes(x=Year,y=e0,color=area))+ # relationships
 geom_line()+ # add a line for each country
 geom_point()+ # add points 
@@ -173,14 +173,14 @@ Produce two scatter plots to display the relationship between violence and life 
 Select records for years 2008 and 2022 \vspace{10pt}
 
 ```{r}
-data_scatter = data |>
+data_scatter <- data |>
 filter(Year %in% c(2008,2022))
 ```
 
 Generate the plot \vspace{10pt}
 
 ```{r}
-plot3 = ggplot(data=data_scatter, # data input
+plot3 <- ggplot(data=data_scatter, # data input
 mapping=aes(x=GPI,y=e0))+ # relationships
 geom_point()+  # scatter plot
 xlab('Level of Violence')+ # x-axis label
@@ -208,7 +208,7 @@ Display the distribution of life expectancy in the 20 most violent countries and
 Let's create the data sets \vspace{10pt} Most violent countries
 
 ```{r}
-data_most_violence = data |>
+data_most_violence <- data |>
       filter(Year==2022) |>
       slice_max(GPI,n=20) |> 
       mutate(label='Most Violent')
@@ -219,7 +219,7 @@ data_most_violence = data |>
 Most peaceful countries
 
 ```{r}
-data_most_peaceful = data |>
+data_most_peaceful <- data |>
 filter(Year==2022) |>
 slice_min(GPI,n=20) |>
 mutate(label='Most Peaceful')
@@ -230,13 +230,13 @@ mutate(label='Most Peaceful')
 combine the two data sets by row
 
 ```{r}
-data_plot=rbind(data_most_violence,data_most_peaceful)
+data_plot <- rbind(data_most_violence,data_most_peaceful)
 ```
 
 # Question 4
 
 ```{r}
-plot4=ggplot(data=data_plot, # data
+plot4 <- ggplot(data=data_plot, # data
 mapping=aes(x=label,y=e0,fill=label))+ # relationships
 geom_boxplot()+ # boxplot
 coord_cartesian(ylim=c(30,90))+ # fix y-axis limits
@@ -265,7 +265,7 @@ plot4
 Perform the same task using a different visual aid.
 
 ```{r}
-plot5 = ggplot(data=data_plot,  # data input
+plot5 <- ggplot(data=data_plot,  # data input
 aes(x=e0,color=label,fill=label))+ # relationships
 geom_density(alpha = 0.2, na.rm = TRUE) + # density
 theme_stata()+ # background
@@ -295,7 +295,7 @@ plot5
 Produce a scatter plot to display the relationship between violence and life expectancy in 2008 and 2022. \vspace{5pt} Make sure to set different shapes and colors for the points according to the region where they are located. \vspace{5pt} Fix the size of the points according to the population size of the country
 
 ```{r}
-plot6 = ggplot(data=data_scatter, # data input
+plot6 <- ggplot(data=data_scatter, # data input
 mapping=aes(x=GPI,y=e0))+ # relationships
 geom_point(aes(shape=area,color=area,size=pop))+ # scatter plot
 xlab('Level of Violence')+ # label x-axis
@@ -321,10 +321,10 @@ plot6
 
 # Question 7
 
-Display the top 5 countries with the largest increase and the top 5 with largest decrease in violence over the period 2008-2022 in Europe, Central Asia & North America
+Display the variation in the level of violence between 2008 and 2022 for the top 5 countries experiencing the largest increase and the top 5 showing the largest decrease in violence in Europe, Central Asia & North America \vspace{10pt}
 
 ```{r}
-data_high = data |>
+data_high <- data |>
 filter(Year %in% c(2008,2022)) |>
 select(Year,Country,area,GPI) |>
 pivot_wider(names_from='Year',values_from='GPI') |>
@@ -332,7 +332,7 @@ mutate(var=(`2022`-`2008`)/`2008`) |>
 group_by(area)|>
 slice_max(var,n=5) |>
 mutate(label='Highest Violence Increase')
-data_low = data |>
+data_low <- data |>
 filter(Year %in% c(2008,2022)) |>
 select(Year,Country,area,GPI) |>
 pivot_wider(names_from='Year',values_from='GPI') |>
@@ -345,22 +345,24 @@ mutate(label='Highest Violence Decrease')
 # Question 7
 
 ```{r}
-plot7 = rbind(data_high,data_low) |>
-filter(area=='Europe, Central Asia & North America') |>
-ggplot(aes(x=Country,y=var,fill=label))+ # data
-geom_bar(stat='identity') + # bar plot
-theme_clean()+ # background
-xlab('Country')+ # x-axis title
-ylab('Variation in Violence')+ # y-axis title
-scale_fill_brewer(name='',palette='Set2')+ # color palette
-scale_y_continuous(labels = scales::percent)+ # y-axis labels
-theme(axis.text.x = element_text(angle = 45,
-vjust = 1, hjust = 1, size = 12, face = "bold"), # x-axis text
-legend.position = 'bottom', # legend position 
-axis.text.y = element_text(size = 12, face = "bold"), # y-axis text
-axis.title.x = element_text(size = 15, face = "bold"), # x-axis title
-axis.title.y = element_text(size = 15, face = "bold"), # y-axis title
-legend.text = element_text(size = 15, face = "bold")) # legend text
+plot7 <- rbind(data_high,data_low) |>
+  filter(area=='Europe, Central Asia & North America') |>
+  mutate(Country=factor(Country,levels=c(data_high$Country,
+                                         data_low$Country))) |>
+  ggplot(aes(x=Country,y=var,fill=label))+ # data
+  geom_bar(stat='identity') + # bar plot
+  theme_clean()+ # background
+  xlab('Country')+ # x-axis title
+  ylab('Variation in Violence')+ # y-axis title
+  scale_fill_brewer(name='',palette='Set2')+ # color palette
+  scale_y_continuous(labels = scales::percent)+ # y-axis labels
+  theme(axis.text.x = element_text(angle = 45,
+  vjust = 1, hjust = 1, size = 12, face = "bold"), # x-axis text
+        legend.position = 'bottom', # legend position 
+        axis.text.y = element_text(size = 12, face = "bold"), # y-axis text
+        axis.title.x = element_text(size = 15, face = "bold"), # x-axis title
+        axis.title.y = element_text(size = 15, face = "bold"), # y-axis title
+        legend.text = element_text(size = 15, face = "bold")) # legend text
 ```
 
 # Question 7
@@ -370,3 +372,32 @@ legend.text = element_text(size = 15, face = "bold")) # legend text
 plot7 
 ```
 
+# Save a plot
+
+*ggsave()* allows to save plots as images in different formats (e.g. .png, .pdf, .jpeg)\vspace{20pt}
+
+```{r}
+#| eval: false
+ggsave(filename = "Results/plot7.pdf", # name of the file
+       plot = plot7, # name of the plot
+       height = 20,  # height of the figure
+       width = 40, # width of the figure
+       units = "cm", # unit of measurement
+       dpi = 400) # resolution of picture 
+```
+
+\vspace{20pt}
+
+Note that graphs can also be saved by pressing the Export bottom in the *Plots* section
+
+# Final remarks
+
+What I presented today is just the tip of the iceberg.
+
+\vspace{20pt}
+
+For other exciting visualizations see the online book https://ggplot2-book.org
+
+\vspace{20pt}
+
+![](images/cheatsheet-01.png){width="8cm" height="5cm"}
