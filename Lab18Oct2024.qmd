@@ -15,84 +15,63 @@ execute:
 
 # Introduction
 
-Measuring **violence** in a country is a challenging task.
-\vspace{20pt}
+Measuring **violence** in a country is a challenging task. \vspace{20pt}
 
-- **Violence** is a multifaceted concept
-\vspace{20pt}
-- It depends on many different factors 
-\vspace{20pt}
-- Multiple sources are needed to capture its complexities
+-   **Violence** is a multifaceted concept \vspace{20pt}
+-   It depends on many different factors \vspace{20pt}
+-   Multiple sources are needed to capture its complexities
 
 # Research Question
 
-- The level of violence may affect the mortality of a country
-\vspace{20pt}
-- Today, we will rely on two major data sources to explore the relationship between violence and mortality:
-  \vspace{20pt}
-  - Data on Violece from the Institute for Economics & Peace
-  \vspace{20pt}
-  - Data on Mortality from the United Nations
-\vspace{20pt}
-- We will produce multiple descriptive plots with functions from **ggplot**
+-   The level of violence may affect the mortality of a country \vspace{20pt}
+-   Today, we will rely on two major data sources to explore the relationship between violence and mortality: \vspace{20pt}
+    -   Data on Violece from the Institute for Economics & Peace \vspace{20pt}
+    -   Data on Mortality from the United Nations \vspace{20pt}
+-   We will produce multiple descriptive plots with functions from **ggplot**
 
 # What about ggplot?
 
-**ggplot2** is an R package for producing statistical, or data, graphics
-\vspace{10pt}
+**ggplot2** is an R package for producing statistical, or data, graphics \vspace{10pt}
 
-Already available in *tidyverse*
+It is already available in *tidyverse*!
 
-![Elephant](Images/logo-ggplot2.png){width=1.5in}
-\vspace{20pt}
+::: {layout-ncol="2"}
+![](Images/ggplot_book.png){width="1.5in"}
+
+![](Images/logo-ggplot2.png){width="1.5in"}
+:::
 
 # ggplot
 
-Major advantages:
-\vspace{20pt}
+Major advantages: \vspace{20pt}
 
-- creating graphs by combining independent components
-\vspace{20pt}
-- detailed theming system to generate nice-looking graphs
-\vspace{20pt}
-- intuitive grammar
-\vspace{20pt}
-- graphs are R objects
-
-
-
+-   creating graphs by combining independent components \vspace{20pt}
+-   detailed theming system to generate nice-looking graphs \vspace{20pt}
+-   intuitive grammar \vspace{20pt}
+-   graphs are R objects
 
 # Indicators for violence and mortality
 
-- **Violence** $\rightarrow$ **Global Peaceful Index** (GPI) that measures the violence of a country across three dimensions:
-\vspace{20pt}
-   -  ongoing domestic and international conflict
-   \vspace{10pt}
-   -  societal safety and security
-   \vspace{10pt}
-   -  militarization
-\vspace{20pt}
-
-- **Mortality** $\rightarrow$ **life expectancy at birth** ($e_0$)
-   \vspace{10pt}
-   - common indicator for capturing the mortality of a population
-
+-   **Violence** $\rightarrow$ **Global Peaceful Index** (GPI) that measures the violence of a country across three dimensions: \vspace{20pt}
+    -   ongoing domestic and international conflict \vspace{10pt}
+    -   societal safety and security \vspace{10pt}
+    -   militarization \vspace{20pt}
+-   **Mortality** $\rightarrow$ **life expectancy at birth** ($e_0$) \vspace{10pt}
+    -   common indicator for capturing the mortality of a population
 
 # Data files
-Two *.txt* data files on Virtuale
-\vspace{20pt}
 
-- *gpi_data.txt* $\rightarrow$ GPI for multiple countries over 2008-2022
-\vspace{20pt}
-- *life_exp_data.txt* $\rightarrow$ life expectancy estimates for multiple countries over 2008-2022 couple
-   \vspace{10pt}
-   - Regional classification included
-   \vspace{10pt}
-   - Total population size
-   
+Two *.txt* data files on Virtuale \vspace{20pt}
+
+-   *gpi_data.txt* $\rightarrow$ GPI for multiple countries over 2008-2022 \vspace{20pt}
+-   *life_exp_data.txt* $\rightarrow$ life expectancy estimates for multiple countries over 2008-2022 couple \vspace{10pt}
+    -   Regional classification included \vspace{10pt}
+    -   Total population size
+
 # Upload data in Rstudio
-Upload *tidyverse* and the data sets
-\vspace{10pt}
+
+Upload *tidyverse* and the data sets \vspace{10pt}
+
 ```{r}
 #install.packages('ggthemes')
 #install.packages('RColorBrewer')
@@ -103,31 +82,33 @@ library("tidyverse") # ggplot2
 gpi_data <- read.table('Data/gpi_data.txt',header=T)
 life_exp_data <- read.table('Data/life_exp_data.txt',header=T)
 ```
-Combine the two data sets by *iso3* (unique to each country) and *Year*
-\vspace{10pt}
+
+Combine the two data sets by *iso3* (unique to each country) and *Year* \vspace{10pt}
+
 ```{r}
 data <- inner_join(gpi_data,life_exp_data,by=c('iso3','Year'))
 ```
+
 \vspace{10pt}
 
-We match all records in *gpi_data*, whose *iso3* and *Year* values have a correspondence in *life_exp_data*
-\vspace{10pt}
+We match all records in *gpi_data*, whose *iso3* and *Year* values have a correspondence in *life_exp_data* \vspace{10pt}
 
-The non-matching records, either in  *gpi_data* or in *life_exp_data*, are dropped
+The non-matching records, either in *gpi_data* or in *life_exp_data*, are dropped
 
-# Question (1)
+# Question 1
 
 Create a plot displaying the evolution of violence over the time period 2008-2022 by world region
 
-Calculate region- and year-specific levels of violence 
-\vspace{10pt}
+Calculate region- and year-specific levels of violence \vspace{10pt}
+
 ```{r}
 data_violence_region = data |>
       group_by(Year,area) |>
       summarize(GPI=weighted.mean(x=GPI,w=pop,na.rm = FALSE)) 
 ```
-Generate the plot 
-\vspace{10pt}
+
+Generate the plot \vspace{10pt}
+
 ```{r}
 plot1 = ggplot(data=data_violence_region, # data input
      mapping=aes(x=Year,y=GPI,color=area))+ # relationships
@@ -139,25 +120,28 @@ xlab('Year')+ #label for title of x-axis
 ylab('Level of Violence') + # label for title of y-axis
 ggtitle('Region-specific Violence over Time')  # title for the plot
 ```
-# Question (1) 
+
+# Question 1
 
 ```{r,echo=F}
 #| echo: false
 plot1
 ```
-# Question (2)
-Create a similar visual aid for life expectancy
-\vspace{10pt}
 
-Calculate region-specific life expectancies 
-\vspace{10pt}
+# Question 2
+
+Create a similar visual aid for life expectancy \vspace{10pt}
+
+Calculate region-specific life expectancy estimates \vspace{10pt}
+
 ```{r}
 data_life_exp_region = data |>
       group_by(Year,area) |>
       summarize(e0=weighted.mean(x=e0,w=pop,na.rm = FALSE))
 ```
-Generate the plot 
-\vspace{10pt}
+
+Generate the plot \vspace{10pt}
+
 ```{r}
 plot2 = ggplot(data=data_life_exp_region, # data input
 mapping=aes(x=Year,y=e0,color=area))+ # relationships
@@ -171,25 +155,30 @@ scale_color_brewer(name = "Region", palette = "Set1")+ # change color palette
 ggtitle('Region-specific Life Expectancy over Time')  # title
 ```
 
-# Question (2) 
+# Question 2
 
 ```{r}
 #| echo: false
 plot2
 ```
-# Question (3)
 
-Produce two scatter plots to display the relationship between violence and life expectancy in 2008 and 2022. Add also a regression line. 
-\vspace{20pt}
+# Question 3
 
-Select records for years 2008 and 2022
-\vspace{10pt}
+Produce two scatter plots to display the relationship between violence and life expectancy in 2008 and 2022. Add also a regression line. \vspace{20pt}
+
+::: notes
+. . .
+:::
+
+Select records for years 2008 and 2022 \vspace{10pt}
+
 ```{r}
 data_scatter = data |>
 filter(Year %in% c(2008,2022))
 ```
-Generate the plot
-\vspace{10pt}
+
+Generate the plot \vspace{10pt}
+
 ```{r}
 plot3 = ggplot(data=data_scatter, # data input
 mapping=aes(x=GPI,y=e0))+ # relationships
@@ -205,7 +194,6 @@ axis.text.x = element_text(size=15,face="bold"),
 axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
 ```
 
-
 # Question 3
 
 ```{r}
@@ -217,29 +205,36 @@ plot3
 
 Display the distribution of life expectancy in the 20 most violent countries and in the 20 most peaceful countries in 2022
 
-Let's create the data sets
-\vspace{10pt}
-Most violent countries
+Let's create the data sets \vspace{10pt} Most violent countries
+
 ```{r}
 data_most_violence = data |>
       filter(Year==2022) |>
       slice_max(GPI,n=20) |> 
       mutate(label='Most Violent')
 ```
+
 \vspace{10pt}
+
 Most peaceful countries
+
 ```{r}
 data_most_peaceful = data |>
 filter(Year==2022) |>
 slice_min(GPI,n=20) |>
 mutate(label='Most Peaceful')
 ```
+
 \vspace{10pt}
+
 combine the two data sets by row
+
 ```{r}
 data_plot=rbind(data_most_violence,data_most_peaceful)
 ```
+
 # Question 4
+
 ```{r}
 plot4=ggplot(data=data_plot, # data
 mapping=aes(x=label,y=e0,fill=label))+ # relationships
@@ -257,13 +252,15 @@ axis.title.y = element_text(size=15,face="bold"), # font of y-axis title
 axis.text.x = element_text(size=15,face="bold"),  # text of x-axis title
 axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
 ```
-# Question 4 
+
+# Question 4
+
 ```{r}
 #| echo: false
 plot4
 ```
 
-# Question 5 
+# Question 5
 
 Perform the same task using a different visual aid.
 
@@ -285,7 +282,9 @@ axis.title.y = element_text(size=15,face="bold"), # font of y-axis title
 axis.text.x = element_text(size=15,face="bold"),  # font of x-axis text
 axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
 ```
-# Question 5 
+
+# Question 5
+
 ```{r}
 #| echo: false
 plot5
@@ -293,12 +292,7 @@ plot5
 
 # Question 6
 
-Produce a scatter plot to display the relationship between violence and life expectancy in 2008 and 2022.
-\vspace{5pt}
-Make sure to set different shapes and colors for the points according to the region where they are located.
-\vspace{5pt}
-Fix the size of the points according to the population size of the country
-
+Produce a scatter plot to display the relationship between violence and life expectancy in 2008 and 2022. \vspace{5pt} Make sure to set different shapes and colors for the points according to the region where they are located. \vspace{5pt} Fix the size of the points according to the population size of the country
 
 ```{r}
 plot6 = ggplot(data=data_scatter, # data input
@@ -317,7 +311,9 @@ legend.text = element_text(size=15,face="bold"),  # font of legend text
 axis.text.x = element_text(size=12,face="bold"),  
 axis.title.x = element_text(size=15,face="bold")) # font of x-axis title
 ```
-# Question 6 
+
+# Question 6
+
 ```{r}
 #| echo: false
 plot6
@@ -346,7 +342,8 @@ slice_min(var,n=5) |>
 mutate(label='Highest Violence Decrease')
 ```
 
-# Question 7 
+# Question 7
+
 ```{r}
 plot7 = rbind(data_high,data_low) |>
 filter(area=='Europe, Central Asia & North America') |>
@@ -366,11 +363,10 @@ axis.title.y = element_text(size = 15, face = "bold"), # y-axis title
 legend.text = element_text(size = 15, face = "bold")) # legend text
 ```
 
-# Question 7 
+# Question 7
+
 ```{r}
 #| echo: false
 plot7 
 ```
----
 
-## 
